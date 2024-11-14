@@ -15,7 +15,7 @@
         </div>
         <div class="form-group mb-2">
             <label for="questionType">Question Type</label>
-            <select class="form-control" id="questionType" name="questionType" required>
+            <select class="form-control" id="questionType" name="questionType" onchange="handleSelectChange()" required>
                 <option value="MultipleChoice">Multiple Choice</option>
                 <option value="TrueFalse">True/False</option>
                 <option value="FillInTheBlank">Fill in the Blank</option>
@@ -37,3 +37,17 @@
         <button type="submit" class="btn btn-primary">Generate</button>
     </form>
 </div>
+
+
+<script>
+    function handleSelectChange() {
+        const questionType = document.getElementById('questionType').value;
+        const numberOfChoices = document.getElementById('numberOfChoices');
+        if (questionType === 'MultipleChoice') {
+            numberOfChoices.disabled = false;
+        } else {
+            numberOfChoices.value = 0;
+            numberOfChoices.disabled = true;
+        }
+    }
+</script>

@@ -106,7 +106,27 @@ public class HomeController : Controller
 <html>
 <head>
     <title>Generated Exam</title>
-
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }}
+        h2, h3 {{
+            color: #333;
+        }}
+        ul {{
+            list-style-type: none;
+            padding-left: 20px;
+        }}
+        ol {{
+            margin-bottom: 20px;
+        }}
+        li {{
+            margin-bottom: 10px;
+        }}
+    </style>
 </head>
 <body>
     {generatedContent}

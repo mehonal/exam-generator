@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using ExamGenerator.Models;
 using ExamGenerator.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExamGenerator.Controllers;
 
@@ -13,6 +14,7 @@ public class HomeController : Controller
     private readonly HttpClient _httpClient;
     private readonly string _openaiApiKey;
     private readonly ApplicationDbContext _context;
+    private const int DAILY_EXAM_LIMIT = 15;
     
     public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
     {
@@ -22,6 +24,18 @@ public class HomeController : Controller
         _httpClient.BaseAddress = new Uri("https://api.openai.com/v1/");
         _openaiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new Exception("API Key is missing from environment variables.");
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_openaiApiKey}");
+    }
+
+    private async Task<bool> HasReachedDailyLimit()
+    {
+        var today = DateTime.UtcNow.Date;
+        var tomorrow = today.AddDays(1);
+        
+        var todayExamCount = await _context.ExamData
+            .Where(e => e.CreatedAt >= today && e.CreatedAt < tomorrow)
+            .CountAsync();
+            
+        return todayExamCount >= DAILY_EXAM_LIMIT;
     }
 
     [Route("/Results", Name = "exam-results")]
@@ -50,12 +64,27 @@ public class HomeController : Controller
     
     public IActionResult Index()
     {
+        var today = DateTime.UtcNow.Date;
+        var tomorrow = today.AddDays(1);
+        var todayExamCount = _context.ExamData
+            .Count(e => e.CreatedAt >= today && e.CreatedAt < tomorrow);
+            
+        ViewData["RemainingExams"] = DAILY_EXAM_LIMIT - todayExamCount;
+        ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+        
         return View();
     }
 
     [HttpPost]
     public async Task<IActionResult> Index(ExamGenerateModel model)
     {
+
+        if (await HasReachedDailyLimit())
+        {
+            TempData["ErrorMessage"] = "Daily exam generation limit (15) has been reached. Please try again tomorrow.";
+            return RedirectToAction("Index");
+        }
+
         string prompt = "You are an exam generator. Only use English latin characters in your exam. Generate an exam with these parameters without including any code blocks or markdown formatting. Just generate Return pure HTML only. Important: You must generate the exact number of questions requested. Even if requested 25 questions, you should generate all 25 questions.";
         
         if (model.QuestionType == "MultipleChoice") {

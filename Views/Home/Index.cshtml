@@ -1,66 +1,86 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model ExamGenerator.Models.ExamGenerateModel
+@{
+    ViewData["Title"] = "Home";
+    var remainingExams = ViewData["RemainingExams"] as int? ?? 0;
+    var errorMessage = ViewData["ErrorMessage"] as string;
 }
-@model ExamGenerator.Models.ExamGenerateModel
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
 
 <div>
     <h1 class="display-4 text-center">Exam Generator</h1>
-    <form method="POST">
-        <div class="form-group mb-2">
-            <label for="courseCode">Course Code</label>
-            <input type="text" class="form-control" id="courseCode" name="courseCode" placeholder="SEN1001" required>
+    <p class="text-center h4 mb-3 fw-light">Remaining exams for today: @remainingExams</p>
+    @if (remainingExams > 0)
+    {
+        <form method="POST">
+            <div class="form-group mb-2">
+                <label for="courseCode">Course Code</label>
+                <input type="text" class="form-control" id="courseCode" name="courseCode" placeholder="SEN1001" required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="courseName">Course Name</label>
+                <input type="text" class="form-control" id="courseName" name="courseName" placeholder="Introduction to Object Oriented Programming" required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="courseContent">Course Content</label>
+                <textarea class="form-control" id="courseContent" name="courseContent" rows="10" placeholder="Enter all course content here that will be used to generate the exam... (max 10,000 characters)" maxlength="10000" required></textarea>
+                <small class="form-text text-muted">Pro tip: You may export your PowerPoint, or similar files to PDF to select and copy all text content and paste it here.</small>
+            </div>
+            <div class="form-group mb-2">
+                <label for="questionType">Question Type</label>
+                <select class="form-control" id="questionType" name="questionType" onchange="handleSelectChange()" required>
+                    <option value="MultipleChoice">Multiple Choice</option>
+                    <option value="TrueFalse">True/False</option>
+                    <option value="FillInTheBlank">Fill in the Blank</option>
+                    <option value="ShortAnswer">Short Answer</option>
+                    <option value="Essay">Essay</option>
+                    <option value="Matching">Matching</option>
+                    <option value="All">All</option>
+                </select>
+            </div>
+            <div class="form-group mb-2">
+                <label for="questionDifficulty">Question Difficulty</label>
+                <select class="form-control" id="questionDifficulty" name="questionDifficulty" required>
+                    <option value="Standard">Standard</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Hard">Hard</option>
+                    <option value="Tricky">Tricky</option>
+                    <option value="EasyHard">Some Easy, Some Hard</option>
+                </select>
+            </div>
+            <div class="form-group mb-2">
+                <label for="showAnswers">Show Answers</label>
+                <select class="form-control" id="showAnswers" name="showAnswers" required>
+                    <option value="No">No</option>
+                    <option value="YesSeparate">Yes - Separate</option>
+                    <option value="YesRightUnder">Yes - Right Under Questions</option>
+                </select>
+            </div>
+            <div class="form-group mb-2">
+                <label for="numberOfQuestions">Number of Questions</label>
+                <input type="number" class="form-control" id="numberOfQuestions" name="numberOfQuestions" min="0" max="50" placeholder="20" required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="numberOfChoices">Number of Choices</label>
+                <input type="number" class="form-control" id="numberOfChoices" name="numberOfChoices" placeholder="4" required>
+                <small class="form-text text-muted">Only for Multiple Choice questions</small>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Generate</button>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            Daily exam generation limit has been reached. Please try again tomorrow.
         </div>
-        <div class="form-group mb-2">
-            <label for="courseName">Course Name</label>
-            <input type="text" class="form-control" id="courseName" name="courseName" placeholder="Introduction to Object Oriented Programming" required>
-        </div>
-        <div class="form-group mb-2">
-            <label for="courseContent">Course Content</label>
-            <textarea class="form-control" id="courseContent" name="courseContent" rows="10" placeholder="Enter all course content here that will be used to generate the exam... (max 10,000 characters)" maxlength="10000" required></textarea>
-            <small class="form-text text-muted">Pro tip: You may export your PowerPoint, or similar files to PDF to select and copy all text content and paste it here.</small>
-        </div>
-        <div class="form-group mb-2">
-            <label for="questionType">Question Type</label>
-            <select class="form-control" id="questionType" name="questionType" onchange="handleSelectChange()" required>
-                <option value="MultipleChoice">Multiple Choice</option>
-                <option value="TrueFalse">True/False</option>
-                <option value="FillInTheBlank">Fill in the Blank</option>
-                <option value="ShortAnswer">Short Answer</option>
-                <option value="Essay">Essay</option>
-                <option value="Matching">Matching</option>
-                <option value="All">All</option>
-            </select>
-        </div>
-        <div class="form-group mb-2">
-            <label for="questionDifficulty">Question Difficulty</label>
-            <select class="form-control" id="questionDifficulty" name="questionDifficulty" required>
-                <option value="Standard">Standard</option>
-                <option value="Easy">Easy</option>
-                <option value="Hard">Hard</option>
-                <option value="Tricky">Tricky</option>
-                <option value="EasyHard">Some Easy, Some Hard</option>
-            </select>
-        </div>
-        <div class="form-group mb-2">
-            <label for="showAnswers">Show Answers</label>
-            <select class="form-control" id="showAnswers" name="showAnswers" required>
-                <option value="No">No</option>
-                <option value="YesSeparate">Yes - Separate</option>
-                <option value="YesRightUnder">Yes - Right Under Questions</option>
-            </select>
-        </div>
-        <div class="form-group mb-2">
-            <label for="numberOfQuestions">Number of Questions</label>
-            <input type="number" class="form-control" id="numberOfQuestions" name="numberOfQuestions" min="0" max="50" placeholder="20" required>
-        </div>
-        <div class="form-group mb-2">
-            <label for="numberOfChoices">Number of Choices</label>
-            <input type="number" class="form-control" id="numberOfChoices" name="numberOfChoices" placeholder="4" required>
-            <small class="form-text text-muted">Only for Multiple Choice questions</small>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Generate</button>
-    </form>
+    }
+
 </div>
 
 

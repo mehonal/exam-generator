@@ -29,6 +29,16 @@ public class HomeController : Controller
     [HttpPost]
     public async Task<IActionResult> Index(ExamGenerateModel model)
     {
+        string prompt = "You are an exam generator. Generate an exam with these parameters without including any code blocks or markdown formatting. Just generate Return pure HTML only.";
+        if (model.ShowAnswers == "No") {
+            prompt += " Do not include the answers in the exam.";
+        }
+        else if (model.ShowAnswers == "YesSeparate") {
+            prompt += " You should have the questions and their answers. Include answers to the questions in a new answers section under the questions section. Do not show answer as you are presenting the question, it should be a separate section.";
+        }
+        else {
+            prompt += " You should show the correct answer right under the question.";
+        }
         try
         {
             var requestBody = new
@@ -39,7 +49,7 @@ public class HomeController : Controller
                     new
                     {
                         role = "system",
-                        content = "You are an exam generator. Generate an exam with these parameters without including any code blocks or markdown formatting. Return pure HTML only."
+                        content = prompt
                     },
                     new
                     {

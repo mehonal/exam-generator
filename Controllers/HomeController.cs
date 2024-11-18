@@ -47,6 +47,11 @@ public class HomeController : Controller
             prompt += " You should show the correct answer under each question.";
         }
 
+        string questionDifficulty = model.QuestionDifficulty;
+        if (model.QuestionDifficulty == "EasyHard") {
+            questionDifficulty = "Some Easy, Some Hard";
+        }
+
         try
         {
             var requestBody = new
@@ -65,6 +70,7 @@ public class HomeController : Controller
                         content = $"Course Code: {model.CourseCode}\n" +
                                 $"Course Name: {model.CourseName}\n" +
                                 $"Type of Questions: {model.QuestionType}\n" +
+                                $"Question Difficulty: {questionDifficulty}" +
                                 $"Number of questions in the exam (ensure you have exactly this amount): {model.NumberOfQuestions}\n" +
                                 $"Number of choices per quesion: {model.NumberOfChoices}\n" +
                                 $"Content to generate the questions based on: {model.CourseContent}"

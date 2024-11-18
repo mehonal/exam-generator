@@ -11,6 +11,6 @@ namespace ExamGenerator.Models
         public int NumberOfChoices { get; set; }
         public string CourseContent { get; set; } = string.Empty;
 
-        public string ShowAnswers { get; set; }
+        public string ShowAnswers { get; set; } = string.Empty;
     }
 }

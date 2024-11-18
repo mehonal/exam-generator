@@ -1,0 +1,60 @@
+@model ExamResultModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generated Exam</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        ol {
+            margin-bottom: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background-color: black;
+            color: white;
+            text-decoration: none;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 7px;
+            margin: 2px;
+            cursor: grab;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    @Html.Raw(Model.GeneratedHtml)
+    <div id='actions'>
+        <button class='btn' id='printOrSaveExam' onclick='printExam()'>Print / Save Exam</button>
+        <a class='btn' href='/'>Generate New Exam</a>
+    </div>
+    <script>
+        function printExam() {
+            document.getElementById('actions').style.display = 'none';
+            window.print();
+            setTimeout(() => {
+                document.getElementById('actions').style.display = 'block';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -24,6 +24,30 @@ public class HomeController : Controller
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_openaiApiKey}");
     }
 
+    [Route("/Results", Name = "exam-results")]
+    public IActionResult Results()
+    {
+        // Get the exam ID from TempData
+        if (TempData["ExamId"] is not int examId)
+        {
+            return RedirectToAction("Index");
+        }
+
+        // Fetch the exam data from the database
+        var examData = _context.ExamData.FirstOrDefault(e => e.Id == examId);
+        if (examData == null)
+        {
+            return RedirectToAction("Index");
+        }
+
+        var resultModel = new ExamResultModel
+        {
+            GeneratedHtml = examData.GeneratedHtml
+        };
+
+        return View(resultModel);
+    }
+    
     public IActionResult Index()
     {
         return View();
@@ -137,70 +161,11 @@ public class HomeController : Controller
             _context.ExamData.Add(examData);
             await _context.SaveChangesAsync();
 
-            // If output is likely to be fully HTML, then just return it 
-            // Otherwise, define a basic HTML structure around it 
-            if (!generatedContent.StartsWith("<!DOCTYPE html>", StringComparison.OrdinalIgnoreCase))
-            {
-                generatedContent = $@"
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Generated Exam</title>
-    <style>
-        body {{
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }}
-        h2, h3 {{
-            color: #333;
-        }}
-        ul {{
-            list-style-type: none;
-            padding-left: 20px;
-        }}
-        ol {{
-            margin-bottom: 20px;
-        }}
-        li {{
-            margin-bottom: 10px;
-        }}
-
-        .btn {{
-            background-color: black;
-            color: white;
-            text-decoration: none;
-            border: none;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 7px;
-            margin: 2px;
-            cursor: grab;
-            display: inline-block;
-        }}
-    </style>
-</head>
-<body>
-    {generatedContent}
-    <div id='actions'>
-        <button class='btn' id='printOrSaveExam' onclick='printExam()'>Print / Save Exam</button>
-        <a class='btn' href='/'>Generate New Exam</a>
-    </div>
-    <script>
-        function printExam() {{
-            document.getElementById('actions').style.display = 'none';
-            window.print();
-            setTimeout(() => {{
-                document.getElementById('actions').style.display = 'block';
-                }}, 3000)
-        }}
-    </script>
-</body>
-</html>";
-            }
-
-            return Content(generatedContent, "text/html");
+            // Store the ID in TempData
+            TempData["ExamId"] = examData.Id;
+            
+            // Redirect to results page
+            return RedirectToRoute("exam-results");
         }
         catch (Exception ex)
         {

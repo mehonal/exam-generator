@@ -32,7 +32,11 @@ public class HomeController : Controller
     [HttpPost]
     public async Task<IActionResult> Index(ExamGenerateModel model)
     {
-        string prompt = "You are an exam generator. Generate an exam with these parameters without including any code blocks or markdown formatting. Just generate Return pure HTML only.";
+        string prompt = "You are an exam generator. Only use English latin characters in your exam. Generate an exam with these parameters without including any code blocks or markdown formatting. Just generate Return pure HTML only. Important: You must generate the exact number of questions requested. Even if requested 25 questions, you should generate all 25 questions.";
+        
+        if (model.QuestionType == "MultipleChoice") {
+            prompt += " You should show the multiple choices under each question.";
+        }
         if (model.ShowAnswers == "No") {
             prompt += " Do not include the answers in the exam.";
         }
@@ -40,10 +44,7 @@ public class HomeController : Controller
             prompt += " You should have the questions and their answers. Include answers to the questions in a new answers section under the questions section. Do not show the correct answer as you are presenting the question, it should be a separate section.";
         }
         else {
-            prompt += " You should show the correct answer right under the question.";
-        }
-        if (model.QuestionType == "MultipleChoice") {
-            prompt += " You should show the multiple choices under each question.";
+            prompt += " You should show the correct answer under each question.";
         }
 
         try
@@ -61,25 +62,23 @@ public class HomeController : Controller
                     new
                     {
                         role = "user",
-                        content = $"CourseCode: {model.CourseCode}\n" +
-                                $"CourseName: {model.CourseName}\n" +
-                                $"QuestionType: {model.QuestionType}\n" +
-                                $"NumberOfQuestions: {model.NumberOfQuestions}\n" +
-                                $"NumberOfChoices: {model.NumberOfChoices}\n" +
-                                $"CourseContent: {model.CourseContent}"
+                        content = $"Course Code: {model.CourseCode}\n" +
+                                $"Course Name: {model.CourseName}\n" +
+                                $"Type of Questions: {model.QuestionType}\n" +
+                                $"Number of questions in the exam (ensure you have exactly this amount): {model.NumberOfQuestions}\n" +
+                                $"Number of choices per quesion: {model.NumberOfChoices}\n" +
+                                $"Content to generate the questions based on: {model.CourseContent}"
                     }
                 },
                 temperature = 1,
-                max_tokens = 8192,
+                max_tokens = 16383,
                 top_p = 1,
                 frequency_penalty = 0,
                 presence_penalty = 0
             };
 
             var jsonContent = JsonSerializer.Serialize(requestBody);
-            
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
             var response = await _httpClient.PostAsync("chat/completions", content);
             var responseContent = await response.Content.ReadAsStringAsync();
 

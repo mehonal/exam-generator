@@ -140,6 +140,19 @@ public class HomeController : Controller
         li {{
             margin-bottom: 10px;
         }}
+
+        .btn {{
+            background-color: black;
+            color: white;
+            text-decoration: none;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 7px;
+            margin: 2px;
+            cursor: grab;
+            display: inline-block;
+        }}
     </style>
 </head>
 <body>

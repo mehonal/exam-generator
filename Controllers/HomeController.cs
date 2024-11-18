@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using ExamGenerator.Models;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 
 namespace ExamGenerator.Controllers;
 
@@ -34,11 +35,15 @@ public class HomeController : Controller
             prompt += " Do not include the answers in the exam.";
         }
         else if (model.ShowAnswers == "YesSeparate") {
-            prompt += " You should have the questions and their answers. Include answers to the questions in a new answers section under the questions section. Do not show answer as you are presenting the question, it should be a separate section.";
+            prompt += " You should have the questions and their answers. Include answers to the questions in a new answers section under the questions section. Do not show the correct answer as you are presenting the question, it should be a separate section.";
         }
         else {
             prompt += " You should show the correct answer right under the question.";
         }
+        if (model.QuestionType == "MultipleChoice") {
+            prompt += " You should show the multiple choices under each question.";
+        }
+
         try
         {
             var requestBody = new

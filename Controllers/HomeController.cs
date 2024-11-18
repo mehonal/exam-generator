@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using ExamGenerator.Models;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
 
 namespace ExamGenerator.Controllers;
 

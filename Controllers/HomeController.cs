@@ -144,6 +144,16 @@ public class HomeController : Controller
 </head>
 <body>
     {generatedContent}
+    <button id='printOrSaveExam' onclick='printExam()'>Print / Save Exam</button>
+    <script>
+        function printExam() {{
+            document.getElementById('printOrSaveExam').style.display = 'none';
+            window.print();
+            setTimeout(() => {{
+                document.getElementById('printOrSaveExam').style.display = 'block';
+                }}, 3000)
+        }}
+    </script>
 </body>
 </html>";
             }

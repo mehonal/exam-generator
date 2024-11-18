@@ -31,7 +31,7 @@ $ set OPENAI_API_KEY=sk-proj-your_key_goes_here
 $ dotnet run
 ```
 
-And enjoy!
+Now just wait for the app to build and run, and you should be able to access it on `localhost:5009`. Enjoy!
 
 # Screenshots 
 

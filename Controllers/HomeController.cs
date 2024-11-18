@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using ExamGenerator.Models;
+using ExamGenerator.Data;
 
 namespace ExamGenerator.Controllers;
 
@@ -11,10 +12,12 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     private readonly HttpClient _httpClient;
     private readonly string _openaiApiKey;
+    private readonly ApplicationDbContext _context;
     
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
     {
         _logger = logger;
+        _context = context;
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = new Uri("https://api.openai.com/v1/");
         _openaiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new Exception("API Key is missing from environment variables.");
@@ -110,6 +113,24 @@ public class HomeController : Controller
                 .Replace("```html", "")
                 .Replace("```", "")
                 .Trim();
+
+            var examData = new ExamData
+            {
+                // form data 
+                CourseCode = model.CourseCode,
+                CourseName = model.CourseName,
+                QuestionType = model.QuestionType,
+                NumberOfQuestions = model.NumberOfQuestions,
+                NumberOfChoices = model.NumberOfChoices,
+                CourseContent = model.CourseContent,
+                ShowAnswers = model.ShowAnswers,
+                
+                GeneratedHtml = generatedContent, // Store the response from GPT
+                CreatedAt = DateTime.UtcNow // auto-gen
+            };
+
+            _context.ExamData.Add(examData);
+            await _context.SaveChangesAsync();
 
             // If output is likely to be fully HTML, then just return it 
             // Otherwise, define a basic HTML structure around it 

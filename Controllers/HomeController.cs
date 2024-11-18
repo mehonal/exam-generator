@@ -144,13 +144,16 @@ public class HomeController : Controller
 </head>
 <body>
     {generatedContent}
-    <button id='printOrSaveExam' onclick='printExam()'>Print / Save Exam</button>
+    <div id='actions'>
+        <button class='btn' id='printOrSaveExam' onclick='printExam()'>Print / Save Exam</button>
+        <a class='btn' href='/'>Generate New Exam</a>
+    </div>
     <script>
         function printExam() {{
-            document.getElementById('printOrSaveExam').style.display = 'none';
+            document.getElementById('actions').style.display = 'none';
             window.print();
             setTimeout(() => {{
-                document.getElementById('printOrSaveExam').style.display = 'block';
+                document.getElementById('actions').style.display = 'block';
                 }}, 3000)
         }}
     </script>

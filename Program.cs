@@ -3,6 +3,9 @@ using ExamGenerator.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// You can use this if you wish to serve on a specific IP address
+// builder.WebHost.UseUrls("http://0.0.0.0:5009");
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
